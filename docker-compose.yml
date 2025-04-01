@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  order-service:
+    build:
+      context: ./backend/OrderService
+      dockerfile: Dockerfile
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=OrderDb;User Id=sa;Password=Your_password123; 
+      - RabbitMQ__HostName=rabbitmq
+    depends_on:
+      - db
+      - rabbitmq
+
+  product-service:
+    build:
+      context: ./backend/ProductService
+      dockerfile: Dockerfile
+    ports:
+      - "5002:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=ProductDb;User Id=sa;Password=Your_password123; 
+      - RabbitMQ__HostName=rabbitmq
+    depends_on:
+      - db
+      - rabbitmq
+
+  customer-service:
+    build:
+      context: ./backend/CustomerService
+      dockerfile: Dockerfile
+    ports:
+      - "5003:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=CustomerDb;User Id=sa;Password=Your_password123; 
+      - RabbitMQ__HostName=rabbitmq
+    depends_on:
+      - db
+      - rabbitmq
+
+  db:
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      - SA_PASSWORD=Your_password123
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
